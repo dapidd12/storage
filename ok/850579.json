@@ -1,0 +1,27 @@
+{
+  "platform": "CoblosinAja",
+  "room": {
+    "title": "Test",
+    "code": "850579",
+    "status": "ended",
+    "totalVoters": 10,
+    "totalVotesCast": 3,
+    "createdAt": "2026-04-06T02:33:39.210Z"
+  },
+  "results": [
+    {
+      "order": 1,
+      "name": "yaya",
+      "vision": "Hsbs",
+      "mission": "Bsbs",
+      "votes": 3
+    },
+    {
+      "order": 2,
+      "name": "Hshsh",
+      "vision": "Hahs",
+      "mission": "Bsh",
+      "votes": 0
+    }
+  ]
+}
