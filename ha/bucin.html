@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Memories - Untukmu</title>
+    
+    <script>
+        const CONFIG = {
+            // Audio Link (Otomatis terputar ulang setelah Buka Buku ditekan)
+            audioLink: "https://raw.githubusercontent.com/dapidd12/storage/main/tes/1782781068976-ssstik.io_1782780737727.mp3", 
+            
+            // Teks Cover (Sampul Depan)
+            coverTitle: "Memories",
+            coverSubtitle: "Kisah Kita",
+            
+            // Halaman 1 (Kata Pengantar)
+            page1Title: "Hai Kamu,",
+            page1Text: "Buku ini menyimpan sebagian kecil dari hal-hal yang membuatku merasa sangat beruntung memilikimu. Buka perlahan ya... ❤️",
+            
+            // Halaman 2 (Awal Bertemu)
+            page2Image: "https://images.unsplash.com/photo-1494774157365-9e04c6720e47?auto=format&fit=crop&w=400&q=80",
+            page2Title: "Awal Pertemuan",
+            page2Text: "Aku masih ingat hari di mana semesta memutuskan untuk mempertemukan kita. Dari semua orang di dunia, mataku tertuju padamu. Dan sejak saat itu, aku tahu ada yang berbeda.",
+            
+            // Halaman 3 (Quotes / Kutipan)
+            page3Quote: '"Kamu adalah alasan mengapa aku sering tersenyum sendiri tanpa sebab."',
+            
+            // Halaman 4 (Momen)
+            page4Image: "https://images.unsplash.com/photo-1474552226712-ac0f0961a954?auto=format&fit=crop&w=400&q=80",
+            page4Title: "Hari-hari Bersamamu",
+            page4Text: "Banyak hal magis terjadi sejak kamu hadir. Hal-hal sederhana menjadi luar biasa hanya karena kita melakukannya bersama.",
+            
+            // Halaman 5 (Ucapan Terima Kasih)
+            page5Text: "Terima kasih karena selalu sabar, selalu ada, dan menerima segala kurangku.",
+            
+            // Halaman 6 (BARU - Momen Lucu/Spesial)
+            page6Image: "https://images.unsplash.com/photo-1518199268839-4976c669d0d3?auto=format&fit=crop&w=400&q=80",
+            page6Title: "Tawamu",
+            page6Text: "Dari semua melodi di dunia, suara tawamu adalah favoritku. Jangan pernah berhenti tersenyum, ya.",
+
+            // Halaman 7 (BARU - Harapan)
+            page7Text: "Semoga langkah kita selalu beriringan, melewati apapun yang ada di depan sana.",
+            
+            // Halaman 8 (Penutup)
+            page8Image: "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=150&q=80",
+            page8Title: "Selamanya",
+            page8Text: "Mari ciptakan lebih banyak memori, buku ini masih memiliki banyak halaman kosong untuk kita isi.",
+            page8Closing: "I Love You ❤️"
+        };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cover-color: #58111A; 
+            --paper-color: #fdfbf7;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #090a0f 0%, #151924 50%, #1f2739 100%);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* --- ANIMASI BINTANG & KUNANG-KUNANG --- */
+        #stars-container, #fireflies-container {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle infinite alternate;
+        }
+        
+        .firefly {
+            position: absolute;
+            background-color: #ffeb3b;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffeb3b, 0 0 20px #ffeb3b;
+            animation: floatUp infinite ease-in-out;
+            opacity: 0;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.1; transform: scale(0.5); }
+            100% { opacity: 0.8; transform: scale(1.2); }
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+            20% { opacity: 0.8; }
+            50% { transform: translateY(50vh) translateX(20px) scale(1); opacity: 1; }
+            80% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) translateX(-20px) scale(0); opacity: 0; }
+        }
+
+        .font-cursive { font-family: 'Dancing Script', cursive; }
+
+        /* --- 3D SCENE & BUKU SETUP --- */
+        .scene {
+            width: 100vw;
+            height: 100vh;
+            perspective: 2000px;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        #book-scaler {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            width: 300px;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .book-wrapper {
+            position: relative;
+            width: 300px;
+            height: 420px;
+            transform-style: preserve-3d;
+        }
+
+        .book {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .book.is-open { transform: translateX(50%); }
+
+        /* --- LEAVES & PAGES --- */
+        .leaf {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .leaf.flipped { transform: rotateY(-180deg); }
+
+        .page {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .page.back { transform: rotateY(180deg); }
+
+        .page-content {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--paper-color);
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .page.front .page-content { border-radius: 2px 10px 10px 2px; }
+        .page.back .page-content { border-radius: 10px 2px 2px 10px; }
+
+        .shadow-right { box-shadow: inset 20px 0 30px -10px rgba(0,0,0,0.15), inset -2px 0 5px rgba(0,0,0,0.05); }
+        .shadow-left { box-shadow: inset -20px 0 30px -10px rgba(0,0,0,0.15), inset 2px 0 5px rgba(0,0,0,0.05); }
+
+        /* --- ANIMASI COVER & LOVE AIR HUJAN --- */
+        #cover-front-content {
+            background-color: transparent;
+            box-shadow: none;
+            transition: background-color 1.5s ease, box-shadow 1.5s ease;
+        }
+
+        #cover-front-content.show-cover {
+            background-color: var(--cover-color);
+            box-shadow: inset 4px 0 20px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cover-element {
+            opacity: 0;
+            transition: opacity 1.5s ease;
+        }
+        #cover-front-content.show-cover .cover-element { opacity: 1; }
+
+        .book-closed .leaf:not(#leaf-0) { opacity: 0; pointer-events: none; }
+        .book-closed .page.back { opacity: 0; pointer-events: none; }
+
+        #heart-svg-container {
+            transform: scale(3.5);
+            transition: transform 2s cubic-bezier(0.25, 1, 0.5, 1);
+            filter: drop-shadow(0 0 15px rgba(255,77,77,0.2));
+        }
+
+        #heart-svg-container.shrink {
+            transform: scale(1);
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+        }
+
+        .raindrops { animation: hideRains 0.5s 7.5s forwards; }
+        .drop { animation: rainFall linear infinite; }
+        .d1 { animation-duration: 0.8s; animation-delay: 0s; }
+        .d2 { animation-duration: 1.2s; animation-delay: 0.3s; }
+        .d3 { animation-duration: 1s; animation-delay: 0.5s; }
+        .d4 { animation-duration: 0.9s; animation-delay: 0.1s; }
+        .d5 { animation-duration: 1.1s; animation-delay: 0.4s; }
+
+        @keyframes rainFall {
+            0% { transform: translateY(-20px); opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(110px); opacity: 0; }
+        }
+        @keyframes hideRains { to { opacity: 0; display: none; } }
+
+        .water-group {
+            transform: translateY(100%);
+            animation: fillUp 7.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .water-wave-1 { fill: #ff1a1a; }
+        .water-wave-2 { fill: #ff4d4d; animation-delay: 0.3s; }
+
+        @keyframes fillUp {
+            0% { transform: translateY(100%); }
+            100% { transform: translateY(0%); }
+        }
+
+        .polaroid {
+            background: white;
+            padding: 8px 8px 25px 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 2px;
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+        }
+        .polaroid:hover { transform: scale(1.05) rotate(0deg); }
+        .polaroid.right-tilt { transform: rotate(2deg); }
+        .polaroid.right-tilt:hover { transform: scale(1.05) rotate(0deg); }
+
+        /* --- TOMBOL --- */
+        #controls-wrapper {
+            position: absolute;
+            bottom: -70px;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        #controls-wrapper.is-open { transform: translateX(50%); }
+
+        .btn-bucin {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .btn-bucin:hover { background: white; color: #050505; transform: translateY(-2px); }
+        
+        #nav-container { display: none; gap: 20px; opacity: 0; transition: opacity 0.5s ease; }
+        #nav-container.visible { opacity: 1; }
+        
+        #btn-open-container { display: flex; opacity: 0; transition: opacity 1s ease; }
+
+        .gold-border {
+            position: absolute;
+            inset: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 2px 8px 8px 2px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="book-closed text-gray-800">
+
+    <div id="stars-container"></div>
+    <div id="fireflies-container"></div>
+
+    <audio id="audio-bgm" loop preload="auto"></audio>
+
+    <div class="scene" id="scene">
+        <div id="book-scaler">
+            
+            <div class="book-wrapper">
+                <div class="book" id="book">
+                    
+                    <div class="leaf" id="leaf-0">
+                        <div class="page front">
+                            <div class="page-content justify-center items-center relative" id="cover-front-content">
+                                <div class="gold-border cover-element"></div>
+                                <div class="z-10" id="heart-svg-container">
+                                    <svg viewBox="0 0 100 100" class="w-24 h-24 overflow-visible">
+                                        <defs>
+                                            <clipPath id="heart-clip">
+                                                <path d="M 50,90 C 20,65 5,45 5,25 C 5,10 18,0 32,0 C 42,0 47,5 50,10 C 53,5 58,0 68,0 C 82,0 95,10 95,25 C 95,45 80,65 50,90 Z" />
+                                            </clipPath>
+                                        </defs>
+                                        <g clip-path="url(#heart-clip)">
+                                            <g class="raindrops">
+                                                <rect x="25" y="-10" width="1.5" height="6" fill="#ff9999" class="drop d1" rx="1"/>
+                                                <rect x="45" y="-20" width="2" height="8" fill="#ff4d4d" class="drop d2" rx="1"/>
+                                                <rect x="65" y="-15" width="1.5" height="5" fill="#ff9999" class="drop d3" rx="1"/>
+                                                <rect x="35" y="-5" width="2" height="7" fill="#ff1a1a" class="drop d4" rx="1"/>
+                                                <rect x="75" y="-25" width="2" height="9" fill="#ff4d4d" class="drop d5" rx="1"/>
+                                            </g>
+                                            <rect class="water-group water-wave-1" x="0" y="0" width="100" height="100" />
+                                            <rect class="water-group water-wave-2" x="0" y="0" width="100" height="100" />
+                                        </g>
+                                    </svg>
+                                </div>
+                                <h1 id="el-cover-title" class="font-cursive text-5xl text-yellow-100 mt-6 cover-element drop-shadow-md z-10" style="text-shadow: 2px 2px 6px rgba(0,0,0,0.8);"></h1>
+                                <p id="el-cover-subtitle" class="text-yellow-100/60 text-xs mt-2 cover-element tracking-widest uppercase"></p>
+                            </div>
+                        </div>
+
+                        <div class="page back">
+                            <div class="page-content shadow-left items-center justify-center p-8 text-center relative">
+                                <div class="absolute inset-4 border border-gray-200 rounded"></div>
+                                <div class="z-10">
+                                    <h2 id="el-page1-title" class="font-cursive text-4xl text-rose-500 mb-4"></h2>
+                                    <p id="el-page1-text" class="text-sm leading-relaxed text-gray-600"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="leaf" id="leaf-1">
+                        <div class="page front">
+                            <div class="page-content shadow-right p-6 pt-10 items-center text-center">
+                                <div class="polaroid w-full mb-5">
+                                    <img id="el-page2-img" src="" alt="Photo 1" class="w-full h-40 object-cover rounded-sm">
+                                </div>
+                                <h3 id="el-page2-title" class="font-cursive text-3xl text-rose-600 mb-2"></h3>
+                                <p id="el-page2-text" class="text-[11px] leading-relaxed text-gray-600"></p>
+                            </div>
+                        </div>
+
+                        <div class="page back">
+                            <div class="page-content shadow-left p-8 justify-center items-center text-center">
+                                <svg class="w-10 h-10 text-rose-300 mb-4 transform hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20"><path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"></path></svg>
+                                <p id="el-page3-quote" class="font-cursive text-2xl text-gray-700 leading-snug"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="leaf" id="leaf-2">
+                        <div class="page front">
+                            <div class="page-content shadow-right p-6 pt-10 items-center text-center">
+                                <div class="polaroid right-tilt w-full mb-5">
+                                    <img id="el-page4-img" src="" alt="Photo 2" class="w-full h-40 object-cover rounded-sm">
+                                </div>
+                                <h3 id="el-page4-title" class="font-cursive text-3xl text-rose-600 mb-2"></h3>
+                                <p id="el-page4-text" class="text-[11px] leading-relaxed text-gray-600"></p>
+                            </div>
+                        </div>
+
+                        <div class="page back">
+                            <div class="page-content shadow-left p-6 justify-center items-center text-center">
+                                <div class="w-full h-full border-2 border-dashed border-rose-200 rounded p-4 flex flex-col justify-center items-center bg-rose-50/30">
+                                    <p id="el-page5-text" class="text-sm font-medium text-gray-600 mb-5"></p>
+                                    <div class="flex gap-2 justify-center">
+                                        <span class="block w-2 h-2 rounded-full bg-rose-300 animate-bounce"></span>
+                                        <span class="block w-2 h-2 rounded-full bg-rose-400 animate-bounce" style="animation-delay: 0.1s"></span>
+                                        <span class="block w-2 h-2 rounded-full bg-rose-500 animate-bounce" style="animation-delay: 0.2s"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="leaf" id="leaf-3">
+                        <div class="page front">
+                            <div class="page-content shadow-right p-6 pt-10 items-center text-center">
+                                <div class="polaroid w-full mb-5">
+                                    <img id="el-page6-img" src="" alt="Photo 3" class="w-full h-40 object-cover rounded-sm">
+                                </div>
+                                <h3 id="el-page6-title" class="font-cursive text-3xl text-rose-600 mb-2"></h3>
+                                <p id="el-page6-text" class="text-[11px] leading-relaxed text-gray-600"></p>
+                            </div>
+                        </div>
+
+                        <div class="page back">
+                            <div class="page-content shadow-left p-8 justify-center items-center text-center">
+                                <div class="w-full border-t border-b border-rose-200 py-6 relative">
+                                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-paper-color px-2 text-rose-300 text-xl font-cursive">✦</div>
+                                    <p id="el-page7-text" class="font-cursive text-2xl text-gray-700 leading-snug"></p>
+                                    <div class="absolute -bottom-3 left-1/2 transform -translate-x-1/2 bg-paper-color px-2 text-rose-300 text-xl font-cursive">✦</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="leaf" id="leaf-4">
+                        <div class="page front">
+                            <div class="page-content shadow-right p-6 pt-12 items-center text-center">
+                                <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-rose-100 mb-5 shadow-lg transform hover:scale-105 transition-transform duration-500">
+                                    <img id="el-page8-img" src="" alt="Photo 4" class="w-full h-full object-cover">
+                                </div>
+                                <h3 id="el-page8-title" class="font-cursive text-4xl text-rose-600 mb-3"></h3>
+                                <p id="el-page8-text" class="text-xs leading-relaxed text-gray-600 mb-6"></p>
+                                <p id="el-page8-closing" class="font-cursive text-3xl font-bold text-gray-800"></p>
+                            </div>
+                        </div>
+
+                        <div class="page back">
+                            <div class="page-content shadow-left items-center justify-center" style="background-color: var(--cover-color);">
+                                <div class="gold-border" style="left: 12px; right: 12px; border-radius: 8px 2px 2px 8px;"></div>
+                                <p class="text-yellow-100/50 text-xs font-serif tracking-widest">- TAMAT -</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="controls-wrapper">
+                <div id="btn-open-container">
+                    <button id="btn-open" class="btn-bucin">BUKA BUKU</button>
+                </div>
+                
+                <div id="nav-container">
+                    <button id="btn-prev" class="bg-gray-800/80 hover:bg-black border border-gray-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all transform hover:scale-105">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <button id="btn-next" class="bg-gray-800/80 hover:bg-black border border-gray-600 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all transform hover:scale-105">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Injeksi Konten dari Object CONFIG yang ada di <head>
+            document.getElementById('audio-bgm').src = CONFIG.audioLink;
+            document.getElementById('el-cover-title').innerText = CONFIG.coverTitle;
+            document.getElementById('el-cover-subtitle').innerText = CONFIG.coverSubtitle;
+            document.getElementById('el-page1-title').innerText = CONFIG.page1Title;
+            document.getElementById('el-page1-text').innerText = CONFIG.page1Text;
+            document.getElementById('el-page2-img').src = CONFIG.page2Image;
+            document.getElementById('el-page2-title').innerText = CONFIG.page2Title;
+            document.getElementById('el-page2-text').innerText = CONFIG.page2Text;
+            document.getElementById('el-page3-quote').innerText = CONFIG.page3Quote;
+            document.getElementById('el-page4-img').src = CONFIG.page4Image;
+            document.getElementById('el-page4-title').innerText = CONFIG.page4Title;
+            document.getElementById('el-page4-text').innerText = CONFIG.page4Text;
+            document.getElementById('el-page5-text').innerText = CONFIG.page5Text;
+            document.getElementById('el-page6-img').src = CONFIG.page6Image;
+            document.getElementById('el-page6-title').innerText = CONFIG.page6Title;
+            document.getElementById('el-page6-text').innerText = CONFIG.page6Text;
+            document.getElementById('el-page7-text').innerText = CONFIG.page7Text;
+            document.getElementById('el-page8-img').src = CONFIG.page8Image;
+            document.getElementById('el-page8-title').innerText = CONFIG.page8Title;
+            document.getElementById('el-page8-text').innerText = CONFIG.page8Text;
+            document.getElementById('el-page8-closing').innerText = CONFIG.page8Closing;
+
+            // Generate Bintang
+            const starsContainer = document.getElementById('stars-container');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                const size = Math.random() * 3 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                star.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                starsContainer.appendChild(star);
+            }
+
+            // Generate Kunang-Kunang
+            const firefliesContainer = document.getElementById('fireflies-container');
+            for (let i = 0; i < 20; i++) {
+                const firefly = document.createElement('div');
+                firefly.classList.add('firefly');
+                const size = Math.random() * 4 + 2;
+                firefly.style.width = `${size}px`;
+                firefly.style.height = `${size}px`;
+                firefly.style.left = `${Math.random() * 100}vw`;
+                firefly.style.animationDelay = `${Math.random() * 10}s`;
+                firefly.style.animationDuration = `${Math.random() * 8 + 5}s`;
+                firefliesContainer.appendChild(firefly);
+            }
+
+            // Variabel DOM
+            const book = document.getElementById('book');
+            const bookScaler = document.getElementById('book-scaler');
+            const coverFrontContent = document.getElementById('cover-front-content');
+            const heartSvgContainer = document.getElementById('heart-svg-container');
+            const controlsWrapper = document.getElementById('controls-wrapper');
+            const btnOpenContainer = document.getElementById('btn-open-container');
+            const btnOpen = document.getElementById('btn-open');
+            const navContainer = document.getElementById('nav-container');
+            const btnNext = document.getElementById('btn-next');
+            const btnPrev = document.getElementById('btn-prev');
+            const audioBgm = document.getElementById('audio-bgm');
+            
+            const leaves = document.querySelectorAll('.leaf');
+            const totalLeaves = leaves.length;
+            let currentLeafIndex = 0;
+
+            function updateZIndex() {
+                leaves.forEach((leaf, index) => {
+                    if (leaf.classList.contains('flipped')) {
+                        leaf.style.zIndex = index + 1;
+                    } else {
+                        leaf.style.zIndex = totalLeaves - index;
+                    }
+                });
+            }
+            updateZIndex();
+
+            setTimeout(() => { heartSvgContainer.classList.add('shrink'); }, 7800);
+
+            setTimeout(() => {
+                coverFrontContent.classList.add('show-cover');
+                btnOpenContainer.style.opacity = '1';
+                setTimeout(() => document.body.classList.remove('book-closed'), 500);
+            }, 9000);
+
+            function setBookScale() {
+                const isMobile = window.innerWidth < 768;
+                const padding = isMobile ? 30 : 80;
+                let scale = 1;
+                
+                if (book.classList.contains('is-open')) {
+                    const availableWidth = window.innerWidth - padding;
+                    if (availableWidth < 600) scale = availableWidth / 600;
+                } else {
+                    const availableWidth = window.innerWidth - padding;
+                    if (availableWidth < 300) scale = availableWidth / 300;
+                }
+                
+                if(scale < 0.6 && window.innerHeight < 700) scale = 0.65;
+                bookScaler.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            }
+
+            window.addEventListener('resize', setBookScale);
+            setBookScale();
+
+            btnOpen.addEventListener('click', () => {
+                audioBgm.play().catch(e => console.log("Audio block: ", e));
+                btnOpenContainer.style.display = 'none';
+                navContainer.style.display = 'flex'; 
+                
+                book.classList.add('is-open');
+                controlsWrapper.classList.add('is-open');
+                setBookScale();
+
+                leaves[0].classList.add('flipped');
+                currentLeafIndex = 1;
+                updateZIndex();
+                
+                setTimeout(() => {
+                    navContainer.classList.add('visible');
+                    updateNavButtons();
+                }, 800);
+            });
+
+            function updateNavButtons() {
+                if(currentLeafIndex === totalLeaves) {
+                    btnNext.style.opacity = '0.3';
+                    btnNext.style.pointerEvents = 'none';
+                } else {
+                    btnNext.style.opacity = '1';
+                    btnNext.style.pointerEvents = 'auto';
+                }
+
+                if(currentLeafIndex === 0) {
+                    navContainer.classList.remove('visible');
+                    book.classList.remove('is-open');
+                    controlsWrapper.classList.remove('is-open');
+                    setBookScale();
+                    
+                    setTimeout(() => {
+                        navContainer.style.display = 'none';
+                        btnOpenContainer.style.display = 'flex';
+                        setTimeout(() => btnOpenContainer.style.opacity = '1', 50);
+                    }, 500);
+                }
+            }
+
+            btnNext.addEventListener('click', () => {
+                if (currentLeafIndex < totalLeaves) {
+                    leaves[currentLeafIndex].classList.add('flipped');
+                    currentLeafIndex++;
+                    updateZIndex();
+                    updateNavButtons();
+                }
+            });
+
+            btnPrev.addEventListener('click', () => {
+                if (currentLeafIndex > 0) {
+                    currentLeafIndex--;
+                    leaves[currentLeafIndex].classList.remove('flipped');
+                    updateZIndex();
+                    updateNavButtons();
+                }
+            });
+            
+        });
+    </script>
+</body>
+</html>
